@@ -1,42 +1,45 @@
 services:
   - type: web
-    name: auth-service
-    env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn auth_service.wsgi:application
-    plan: free
-    envVars:
-      - key: DJANGO_SETTINGS_MODULE
-        value: auth_service.settings
-      - key: SECRET_KEY
-        value: your-super-secret-key
-      - key: DEBUG
-        value: False
-
-  - type: web
     name: system-monitor
-    env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn system_monitor.wsgi:application
+    env: docker
     plan: free
+    dockerfilePath: ./system_monitor/Dockerfile
+    buildCommand: ""
+    startCommand: ""
     envVars:
-      - key: DJANGO_SETTINGS_MODULE
-        value: system_monitor.settings
-      - key: SECRET_KEY
-        value: your-super-secret-key
-      - key: DEBUG
+      - key: DJANGO_SECRET_KEY
+        value: your-system-monitor-secret-key
+      - key: DJANGO_DEBUG
         value: False
 
   - type: web
     name: report-service
-    env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn report_service.wsgi:application
+    env: docker
     plan: free
+    dockerfilePath: ./report_service/Dockerfile
+    buildCommand: ""
+    startCommand: ""
     envVars:
-      - key: DJANGO_SETTINGS_MODULE
-        value: report_service.settings
-      - key: SECRET_KEY
-        value: your-super-secret-key
-      - key: DEBUG
+      - key: DJANGO_SECRET_KEY
+        value: your-report-service-secret-key
+      - key: DJANGO_DEBUG
         value: False
+      - key: SYSTEM_MONITOR_URL
+        value: https://system-monitor.onrender.com/api/stats/
+
+  - type: web
+    name: auth-service
+    env: docker
+    plan: free
+    dockerfilePath: ./auth_service/Dockerfile
+    buildCommand: ""
+    startCommand: ""
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        value: your-auth-service-secret-key
+      - key: DJANGO_DEBUG
+        value: False
+      - key: SYSTEM_MONITOR_URL
+        value: https://system-monitor.onrender.com/api/stats/
+      - key: REPORT_SERVICE_URL
+        value: https://report-service.onrender.com/api/history/

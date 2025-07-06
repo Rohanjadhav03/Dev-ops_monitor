@@ -1,7 +1,7 @@
 from django.urls import path
-from .views import history
-from . import views
+from .views import history, home_redirect
+
 urlpatterns = [
     path('history/', history, name='history'),
-    path('', views.home_redirect, name='home'),
+    path('', home_redirect, name='home'),
 ]

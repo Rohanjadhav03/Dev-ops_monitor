@@ -5,9 +5,9 @@ from rest_framework import status
 from .models import SystemStat
 from .serializers import SystemStatSerializer
 from django.shortcuts import redirect
+import os
 
-# Hardcoded Render URL for system-monitor
-SYSTEM_MONITOR_URL = "https://system-monitor.onrender.com/api/stats/"
+SYSTEM_MONITOR_URL = os.environ.get('SYSTEM_MONITOR_URL', 'http://localhost:8000/api/stats/')
 
 @api_view(['GET'])
 def history(request):
@@ -31,6 +31,6 @@ def history(request):
                 return Response({'error': 'Failed to fetch data from system-monitor'}, status=502)
         except requests.exceptions.RequestException:
             return Response({'error': 'Could not connect to system-monitor'}, status=503)
-        
+
 def home_redirect(request):
     return redirect('/api/history/')

@@ -1,4 +1,4 @@
-version: "3"
+version: "3.9"
 
 services:
   system-monitor:
@@ -8,6 +8,9 @@ services:
       - "8000:8000"
     volumes:
       - ./system_monitor:/app
+    environment:
+      - DJANGO_SECRET_KEY=your-system-monitor-secret-key
+      - DJANGO_DEBUG=False
     restart: always
 
   report-service:
@@ -17,6 +20,10 @@ services:
       - "8001:8000"
     volumes:
       - ./report_service:/app
+    environment:
+      - DJANGO_SECRET_KEY=your-report-service-secret-key
+      - DJANGO_DEBUG=False
+      - SYSTEM_MONITOR_URL=http://system-monitor:8000/api/stats/
     depends_on:
       - system-monitor
     restart: always
@@ -28,4 +35,12 @@ services:
       - "8002:8000"
     volumes:
       - ./auth_service:/app
+    environment:
+      - DJANGO_SECRET_KEY=your-auth-service-secret-key
+      - DJANGO_DEBUG=False
+      - SYSTEM_MONITOR_URL=http://system-monitor:8000/api/stats/
+      - REPORT_SERVICE_URL=http://report-service:8000/api/history/
+    depends_on:
+      - report-service
+      - system-monitor
     restart: always
