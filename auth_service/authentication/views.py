@@ -4,7 +4,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import status
 import os
 
 SYSTEM_MONITOR_URL = os.environ.get('SYSTEM_MONITOR_URL', 'http://localhost:8000/api/stats/')
