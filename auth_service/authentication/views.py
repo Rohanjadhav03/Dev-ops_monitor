@@ -2,13 +2,11 @@ import requests
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 import os
 
-# URLs from environment variables
 SYSTEM_MONITOR_URL = os.environ.get('SYSTEM_MONITOR_URL', 'http://localhost:8000/api/stats/')
 REPORT_SERVICE_URL = os.environ.get('REPORT_SERVICE_URL', 'http://localhost:8001/api/history/')
 

@@ -1,4 +1,4 @@
-version: "3.9"
+version: "3"
 
 services:
   system-monitor:
@@ -6,41 +6,32 @@ services:
     container_name: system-monitor
     ports:
       - "8000:8000"
-    volumes:
-      - ./system_monitor:/app
     environment:
-      - DJANGO_SECRET_KEY=your-system-monitor-secret-key
-      - DJANGO_DEBUG=False
-    restart: always
+      DJANGO_SECRET_KEY: "super-secret-key"
+      DJANGO_DEBUG: "False"
 
   report-service:
     build: ./report_service
     container_name: report-service
     ports:
       - "8001:8000"
-    volumes:
-      - ./report_service:/app
-    environment:
-      - DJANGO_SECRET_KEY=your-report-service-secret-key
-      - DJANGO_DEBUG=False
-      - SYSTEM_MONITOR_URL=http://system-monitor:8000/api/stats/
     depends_on:
       - system-monitor
-    restart: always
+    environment:
+      DJANGO_SECRET_KEY: "super-secret-key"
+      DJANGO_DEBUG: "False"
+      SYSTEM_MONITOR_URL: "http://system-monitor:8000/api/stats/"
 
   auth-service:
     build: ./auth_service
     container_name: auth-service
     ports:
       - "8002:8000"
-    volumes:
-      - ./auth_service:/app
-    environment:
-      - DJANGO_SECRET_KEY=your-auth-service-secret-key
-      - DJANGO_DEBUG=False
-      - SYSTEM_MONITOR_URL=http://system-monitor:8000/api/stats/
-      - REPORT_SERVICE_URL=http://report-service:8000/api/history/
     depends_on:
       - report-service
       - system-monitor
-    restart: always
+    environment:
+      DJANGO_SECRET_KEY: "super-secret-key"
+      DJANGO_DEBUG: "False"
+      SYSTEM_MONITOR_URL: "http://system-monitor:8000/api/stats/"
+      REPORT_SERVICE_URL: "http://report-service:8001/api/history/"
