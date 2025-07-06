@@ -2,12 +2,15 @@ import requests
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-import os
+from rest_framework import status
+from django.shortcuts import render
 
-SYSTEM_MONITOR_URL = os.environ.get('SYSTEM_MONITOR_URL', 'http://localhost:8000/api/stats/')
-REPORT_SERVICE_URL = os.environ.get('REPORT_SERVICE_URL', 'http://localhost:8001/api/history/')
+# Hardcoded Render URLs
+SYSTEM_MONITOR_URL = "https://system-monitor.onrender.com/api/stats/"
+REPORT_SERVICE_URL = "https://report-service.onrender.com/api/history/"
 
 def register_view(request):
     if request.method == "POST":
@@ -37,7 +40,7 @@ def logout_view(request):
     return redirect('login')
 
 @login_required
-def dashboard_view(request):
+def dashboard(request):
     return render(request, 'dashboard.html')
 
 @api_view(['GET'])
@@ -57,3 +60,8 @@ def proxy_history(request):
         return Response(response.json())
     except requests.exceptions.RequestException:
         return Response({'error': 'Could not connect to report-service'}, status=503)
+    
+   
+
+def dashboard_view(request):
+    return render(request, 'dashboard.html')
