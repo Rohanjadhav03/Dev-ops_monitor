@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: auth-service
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn auth_service.wsgi:application
+    plan: free
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: auth_service.settings
+      - key: SECRET_KEY
+        value: your-super-secret-key
+      - key: DEBUG
+        value: False
+
+  - type: web
+    name: system-monitor
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn system_monitor.wsgi:application
+    plan: free
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: system_monitor.settings
+      - key: SECRET_KEY
+        value: your-super-secret-key
+      - key: DEBUG
+        value: False
+
+  - type: web
+    name: report-service
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn report_service.wsgi:application
+    plan: free
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: report_service.settings
+      - key: SECRET_KEY
+        value: your-super-secret-key
+      - key: DEBUG
+        value: False

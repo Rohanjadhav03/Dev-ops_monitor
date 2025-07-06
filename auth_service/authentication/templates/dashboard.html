@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% load static %}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DevOps Monitoring - Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
+    <style>
+      body {
+        background-color: #0f172a;
+        background-image: url("{% static 'images/Bgimage.png' %}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        color: #f1f5f9;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+      .navbar {
+        background-color: #1e293b;
+      }
+      .navbar-brand {
+        font-weight: bold;
+        color: #38bdf8 !important;
+      }
+      .nav-link {
+        color: #cbd5e1 !important;
+      }
+      .nav-link.active {
+        color: #38bdf8 !important;
+      }
+      .container {
+        margin-top: 50px;
+      }
+      .card {
+        background-color: #1e293b;
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+      }
+      h3 {
+        color: #38bdf8;
+        margin-bottom: 20px;
+      }
+      pre {
+        background-color: #0f172a;
+        color: #94a3b8;
+        border-radius: 12px;
+        padding: 15px;
+        font-size: 14px;
+      }
+      table,
+      td,
+      th {
+        color: #ffffff;
+      }
+      .table-striped > tbody > tr:nth-of-type(odd) {
+        background-color: #1e293b;
+      }
+      .text-danger {
+        color: #f43f5e !important;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">DevOps Monitoring</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link active" id="monitor-tab" href="#">Monitor</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="history-tab" href="#">Check History</a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link text-danger"
+                href="https://auth-service.onrender.com/api/auth/logout/"
+              >
+                Logout
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div id="monitor-section">
+        <h3>Real-time Monitor</h3>
+        <div class="card p-3">
+          <pre id="monitor-data">Loading stats...</pre>
+        </div>
+      </div>
+
+      <div id="history-section" style="display: none">
+        <h3>History</h3>
+        <div class="card p-3">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>CPU Usage</th>
+                <th>RAM Usage</th>
+                <th>Disk Usage</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="history-data"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script src="{% static 'js/bootstrap.bundle.js' %}"></script>
+    <script>
+      document.getElementById("monitor-tab").addEventListener("click", () => {
+        document.getElementById("monitor-section").style.display = "block";
+        document.getElementById("history-section").style.display = "none";
+        setActiveTab("monitor-tab");
+      });
+      document.getElementById("history-tab").addEventListener("click", () => {
+        document.getElementById("monitor-section").style.display = "none";
+        document.getElementById("history-section").style.display = "block";
+        setActiveTab("history-tab");
+        fetchHistory();
+      });
+      function setActiveTab(activeId) {
+        document.getElementById("monitor-tab").classList.remove("active");
+        document.getElementById("history-tab").classList.remove("active");
+        document.getElementById(activeId).classList.add("active");
+      }
+      function fetchMonitorData() {
+        fetch("https://system-monitor.onrender.com/api/stats/")
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("monitor-data").textContent =
+              JSON.stringify(data, null, 2);
+          })
+          .catch((error) => {
+            document.getElementById("monitor-data").textContent =
+              "Error fetching live stats.";
+          });
+      }
+      setInterval(fetchMonitorData, 5000);
+      fetchMonitorData();
+      function fetchHistory() {
+        fetch("https://report-service.onrender.com/api/history/")
+          .then((response) => response.json())
+          .then((data) => {
+            const tbody = document.getElementById("history-data");
+            tbody.innerHTML = "";
+            data.forEach((stat) => {
+              tbody.innerHTML += `
+                <tr>
+                  <td>${stat.id}</td>
+                  <td>${stat.cpu_usage_percent}%</td>
+                  <td>${stat.ram_usage_percent}%</td>
+                  <td>${stat.disk_usage_percent}%</td>
+                  <td>${stat.created_at}</td>
+                </tr>`;
+            });
+          })
+          .catch((error) => {
+            document.getElementById("history-data").innerHTML =
+              '<tr><td colspan="5" class="text-danger">Failed to load history</td></tr>';
+          });
+      }
+    </script>
+  </body>
+</html>
